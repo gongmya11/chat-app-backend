@@ -5,6 +5,7 @@ const cors = require("cors");
 const connectDB = require("./db");
 const authRoutes = require("./routes/auth.route");
 const messageRoutes = require("./routes/message.route");
+const premiumRoutes = require("./routes/premium.route");
 const { app, server } = require("./lib/socket");
 
 app.use(
@@ -22,6 +23,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/premium", premiumRoutes);
 
 app.get("/", (req, res) => res.send("API đang chạy"));
 

@@ -24,6 +24,30 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    coverPhoto: {
+      type: String,
+      default: "",
+    },
+    bio: {
+      type: String,
+      default: "",
+    },
+    gender: {
+      type: String,
+      default: "",
+    },
+    dob: {
+      type: String,
+      default: "",
+    },
+    phone: {
+      type: String,
+      default: "",
+    },
+    premiumUntil: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

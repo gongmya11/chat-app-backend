@@ -20,6 +20,23 @@ const messageSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
+    isEdited: {
+      type: Boolean,
+      default: false,
+    },
+    isRecalled: {
+      type: Boolean,
+      default: false,
+    },
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
+    },
   },
   { timestamps: true }
 );

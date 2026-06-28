@@ -39,6 +39,7 @@ const signup = async (req, res) => {
         username: newUser.username,
         email: newUser.email,
         avatar: newUser.avatar,
+        premiumUntil: newUser.premiumUntil,
         createdAt: newUser.createdAt,
       });
     } else {
@@ -75,6 +76,7 @@ const login = async (req, res) => {
       username: user.username,
       email: user.email,
       avatar: user.avatar,
+      premiumUntil: user.premiumUntil,
       createdAt: user.createdAt,
     });
   } catch (error) {
@@ -102,4 +104,37 @@ const checkAuth = (req, res) => {
   }
 };
 
-module.exports = { signup, login, logout, checkAuth };
+const updateProfile = async (req, res) => {
+  try {
+    const { username, avatar, coverPhoto, bio, gender, dob, phone } = req.body;
+    const userId = req.user._id;
+
+    if (username) {
+      const userExists = await User.findOne({ username, _id: { $ne: userId } });
+      if (userExists) {
+        return res.status(400).json({ message: "Tên tài khoản đã tồn tại" });
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        ...(username !== undefined && { username }),
+        ...(avatar !== undefined && { avatar }),
+        ...(coverPhoto !== undefined && { coverPhoto }),
+        ...(bio !== undefined && { bio }),
+        ...(gender !== undefined && { gender }),
+        ...(dob !== undefined && { dob }),
+        ...(phone !== undefined && { phone }),
+      },
+      { new: true }
+    ).select("-password");
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Lỗi trong updateProfile controller:", error.message);
+    res.status(500).json({ message: "Lỗi hệ thống" });
+  }
+};
+
+module.exports = { signup, login, logout, checkAuth, updateProfile };
