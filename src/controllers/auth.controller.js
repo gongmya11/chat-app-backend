@@ -31,7 +31,7 @@ const signup = async (req, res) => {
 
     if (newUser) {
       // Generate JWT token and set cookie
-      generateToken(newUser._id, res);
+      const token = generateToken(newUser._id, res);
       await newUser.save();
 
       res.status(201).json({
@@ -46,6 +46,7 @@ const signup = async (req, res) => {
         phone: newUser.phone,
         premiumUntil: newUser.premiumUntil,
         createdAt: newUser.createdAt,
+        token,
       });
     } else {
       res.status(400).json({ message: "Dữ liệu người dùng không hợp lệ" });
@@ -74,7 +75,7 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Thông tin tài khoản hoặc mật khẩu không chính xác" });
     }
 
-    generateToken(user._id, res);
+    const token = generateToken(user._id, res);
 
     res.status(200).json({
       _id: user._id,
@@ -88,6 +89,7 @@ const login = async (req, res) => {
       phone: user.phone,
       premiumUntil: user.premiumUntil,
       createdAt: user.createdAt,
+      token,
     });
   } catch (error) {
     console.error("Lỗi trong login controller:", error.message);

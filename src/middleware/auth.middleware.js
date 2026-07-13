@@ -3,7 +3,12 @@ const User = require("../models/User");
 
 const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    let token = req.cookies.jwt;
+
+    // Nếu không có cookie, thử lấy từ Authorization header (dành cho môi trường cross-domain)
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
 
     if (!token) {
       return res.status(401).json({ message: "Không có quyền truy cập - Không tìm thấy token" });
