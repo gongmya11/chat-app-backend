@@ -1,6 +1,6 @@
 const express = require("express");
 const { protectRoute } = require("../middleware/auth.middleware");
-const { getUsersForSidebar, getMessages, sendMessage, togglePinMessage, editMessage, recallMessage } = require("../controllers/message.controller");
+const { getUsersForSidebar, getMessages, sendMessage, togglePinMessage, editMessage, recallMessage, markAsRead } = require("../controllers/message.controller");
 
 const router = express.Router();
 
@@ -10,5 +10,6 @@ router.post("/send/:id", protectRoute, sendMessage);
 router.put("/pin/:id", protectRoute, togglePinMessage);
 router.put("/edit/:id", protectRoute, editMessage);
 router.put("/recall/:id", protectRoute, recallMessage);
+router.put("/read/:id", protectRoute, markAsRead);
 
 module.exports = router;

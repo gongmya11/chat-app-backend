@@ -3,13 +3,45 @@ const Message = require("../models/Message");
 const Conversation = require("../models/Conversation");
 const { getReceiverSocketId, io } = require("../lib/socket");
 
-// Lấy danh sách tất cả user khác cho sidebar
+// Lấy danh sách tất cả bạn bè cho sidebar
 const getUsersForSidebar = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
-    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+    // Tìm user hiện tại và populate danh sách bạn bè
+    const user = await User.findById(loggedInUserId).populate("friends", "-password");
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
 
-    res.status(200).json(filteredUsers);
+    const friendsWithDetails = await Promise.all(
+      user.friends.map(async (friend) => {
+        const conversation = await Conversation.findOne({
+          participants: { $all: [loggedInUserId, friend._id] },
+        });
+
+        let lastMessage = null;
+        let unreadCount = 0;
+
+        if (conversation) {
+          if (conversation.lastMessage) {
+            lastMessage = await Message.findById(conversation.lastMessage).populate("replyTo");
+          }
+          unreadCount = await Message.countDocuments({
+            conversationId: conversation._id,
+            sender: friend._id,
+            isRead: false,
+          });
+        }
+
+        return {
+          ...friend.toObject(),
+          lastMessage,
+          unreadCount,
+        };
+      })
+    );
+
+    res.status(200).json(friendsWithDetails);
   } catch (error) {
     console.error("Lỗi trong getUsersForSidebar controller:", error.message);
     res.status(500).json({ message: "Lỗi hệ thống" });
@@ -247,6 +279,38 @@ const recallMessage = async (req, res) => {
   }
 };
 
+// Đánh dấu đã đọc tất cả tin nhắn từ người gửi cụ thể
+const markAsRead = async (req, res) => {
+  try {
+    const { id: senderId } = req.params;
+    const myId = req.user._id;
+
+    const conversation = await Conversation.findOne({
+      participants: { $all: [myId, senderId] },
+    });
+
+    if (!conversation) {
+      return res.status(200).json({ message: "Không tìm thấy cuộc trò chuyện" });
+    }
+
+    await Message.updateMany(
+      {
+        conversationId: conversation._id,
+        sender: senderId,
+        isRead: false,
+      },
+      {
+        $set: { isRead: true },
+      }
+    );
+
+    res.status(200).json({ success: true, message: "Đã đánh dấu đã đọc" });
+  } catch (error) {
+    console.error("Lỗi trong markAsRead controller:", error.message);
+    res.status(500).json({ message: "Lỗi hệ thống" });
+  }
+};
+
 module.exports = {
   getUsersForSidebar,
   getMessages,
@@ -254,4 +318,5 @@ module.exports = {
   togglePinMessage,
   editMessage,
   recallMessage,
+  markAsRead,
 };

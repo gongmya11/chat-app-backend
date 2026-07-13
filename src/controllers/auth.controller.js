@@ -39,6 +39,11 @@ const signup = async (req, res) => {
         username: newUser.username,
         email: newUser.email,
         avatar: newUser.avatar,
+        coverPhoto: newUser.coverPhoto,
+        bio: newUser.bio,
+        gender: newUser.gender,
+        dob: newUser.dob,
+        phone: newUser.phone,
         premiumUntil: newUser.premiumUntil,
         createdAt: newUser.createdAt,
       });
@@ -76,6 +81,11 @@ const login = async (req, res) => {
       username: user.username,
       email: user.email,
       avatar: user.avatar,
+      coverPhoto: user.coverPhoto,
+      bio: user.bio,
+      gender: user.gender,
+      dob: user.dob,
+      phone: user.phone,
       premiumUntil: user.premiumUntil,
       createdAt: user.createdAt,
     });

@@ -8,6 +8,8 @@ const connectDB = require("./db");
 const authRoutes = require("./routes/auth.route");
 const messageRoutes = require("./routes/message.route");
 const premiumRoutes = require("./routes/premium.route");
+const friendRoutes = require("./routes/friend.route");
+const notificationRoutes = require("./routes/notification.route");
 const { app, server } = require("./lib/socket");
 
 app.use(
@@ -26,6 +28,8 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/premium", premiumRoutes);
+app.use("/api/friends", friendRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.get("/", (req, res) => res.send("API đang chạy"));
 
