@@ -65,7 +65,13 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin" });
     }
 
-    const user = await User.findOne({ email });
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({
+      $or: [
+        { email: cleanEmail },
+        { username: email.trim() }
+      ]
+    });
     if (!user) {
       return res.status(400).json({ message: "Thông tin tài khoản hoặc mật khẩu không chính xác" });
     }
